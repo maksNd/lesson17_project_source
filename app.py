@@ -131,6 +131,8 @@ class GenresView(Resource):
 class GenreView(Resource):
     def put(self, uid):
         genre = Genre.query.get(uid)
+        if not genre:
+            return '', 404
         requested_json = request.json
         genre.name = requested_json.get('name')
         db.session.add(genre)
@@ -160,6 +162,8 @@ class GenresView(Resource):
 class GenreView(Resource):
     def put(self, uid):
         director = Director.query.get(uid)
+        if not director:
+            return '', 404
         requested_json = request.json
         director.name = requested_json.get('name')
         db.session.add(director)
