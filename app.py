@@ -70,15 +70,12 @@ class MovieSchema(Schema):
 
 movie_schema = MovieSchema()
 movies_schema = MovieSchema(many=True)
-genre_schema = GenreSchema()
-genres_schema = GenreSchema(many=True)
-director_schema = DirectorSchema()
-directors_schema = DirectorSchema(many=True)
 
 
-# print(director_schema.dump(Director.query.get(1)))
-# print(genre_schema.dump(Genre.query.get(1)))
-# print(movie_schema.dump(Movie.query.get(1)))
+# genre_schema = GenreSchema()
+# genres_schema = GenreSchema(many=True)
+# director_schema = DirectorSchema()
+# directors_schema = DirectorSchema(many=True)
 
 
 @movie_namespace.route('/')
@@ -118,6 +115,64 @@ class MoviesView(Resource):
             return movies_schema.dump(movies), 200
 
         return '', 404
+
+
+@genre_namespace.route('/')
+class GenresView(Resource):
+    def post(self):
+        requested_json = request.json
+        new_genre = Genre(**requested_json)
+        with db.session.begin():
+            db.session.add(new_genre)
+        return '', 201
+
+
+@genre_namespace.route('/<int:uid>')
+class GenreView(Resource):
+    def put(self, uid):
+        genre = Genre.query.get(uid)
+        requested_json = request.json
+        genre.name = requested_json.get('name')
+        db.session.add(genre)
+        db.session.commit()
+        return '', 204
+
+    def delete(self, uid):
+        genre = Genre.query.get(uid)
+        if not genre:
+            return '', 404
+        db.session.delete(genre)
+        db.session.commit()
+        return '', 204
+
+
+@director_namespace.route('/')
+class GenresView(Resource):
+    def post(self):
+        requested_json = request.json
+        new_director = Director(**requested_json)
+        with db.session.begin():
+            db.session.add(new_director)
+        return '', 201
+
+
+@director_namespace.route('/<int:uid>')
+class GenreView(Resource):
+    def put(self, uid):
+        director = Director.query.get(uid)
+        requested_json = request.json
+        director.name = requested_json.get('name')
+        db.session.add(director)
+        db.session.commit()
+        return '', 204
+
+    def delete(self, uid):
+        director = Director.query.get(uid)
+        if not director:
+            return '', 404
+        db.session.delete(director)
+        db.session.commit()
+        return '', 204
 
 
 if __name__ == '__main__':
