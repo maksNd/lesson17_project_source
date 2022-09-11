@@ -2,7 +2,7 @@ from flask import request
 from flask_restx import Namespace, Resource
 from apis.models_schemas.schemas import MovieSchema
 from apis.models_schemas.models import Movie
-from import_sqlalchemy import db
+from app_config.import_sqlalchemy import db
 
 movie_ns = Namespace('movies')
 

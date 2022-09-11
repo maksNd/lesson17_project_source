@@ -1,4 +1,4 @@
-from import_sqlalchemy import db
+from app_config.import_sqlalchemy import db
 
 
 class Movie(db.Model):
