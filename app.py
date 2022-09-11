@@ -1,6 +1,6 @@
 # app.py
 from config import api, db
-from flask import request, current_app
+from flask import request, current_app, jsonify
 from flask_restx import Resource
 from models import Movie, Genre, Director
 from schemas import MovieSchema, GenreSchema, DirectorSchema
@@ -151,7 +151,7 @@ class DirectorsView(Resource):
 
 
 @director_namespace.route('/<int:uid>')
-class GenreView(Resource):
+class DirectorView(Resource):
     def get(self, uid):
         director = Director.query.get(uid)
         if not director:
