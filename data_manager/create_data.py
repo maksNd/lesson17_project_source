@@ -32,13 +32,12 @@ class Director(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
+
 class Genre(db.Model):
     __tablename__ = 'genre'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
 
-db.drop_all()
-db.create_all()
 
 # -------------------------------------------------------
 data = {
@@ -242,8 +241,14 @@ data = {
         {"name": "Мелодрама", "pk": 13}, {"name": "Детектив", "pk": 14}, {"name": "Авторское кино", "pk": 15},
         {"name": "Мультфильм", "pk": 16}, {"name": "Вестерн", "pk": 17}, {"name": "Мюзикл", "pk": 18}],
 }
+
+
 # -------------------------------------------------------
 def fill_db():
+
+    db.drop_all()
+    db.create_all()
+
     for movie in data["movies"]:
         m = Movie(
             id=movie["pk"],
