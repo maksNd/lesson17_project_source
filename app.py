@@ -3,7 +3,6 @@ from config import api, db
 from flask import request, current_app
 from flask_restx import Api, Resource
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import exc
 from marshmallow import Schema, fields
 from models import Movie, Genre, Director
 from schemas import MovieSchema, GenreSchema, DirectorSchema
@@ -22,31 +21,25 @@ class MoviesView(Resource):
         page = request.values.get('page')
         director_id = request.values.get('director_id')
         genre_id = request.values.get('genre_id')
-        print(page, director_id, genre_id)
 
         if director_id and genre_id:
-            print('director genre')
-            wanted_movies = Movie.query.filter(Movie.genre_id == genre_id, Movie.director_id == director_id).all()
+            wanted_movies = Movie.query.filter(Movie.genre_id == genre_id and Movie.director_id == director_id).all()
 
         elif director_id and not genre_id:
-            print('director')
             wanted_movies = Movie.query.filter(Movie.director_id == director_id).all()
 
         elif genre_id and not director_id:
-            print('genre')
             wanted_movies = Movie.query.filter(Movie.genre_id == genre_id).all()
 
         elif page:
-            print('page')
             page = int(page)
-            per_page = 5
-            wanted_movies = db.session.query(Movie).offset((page * per_page) - per_page).limit(per_page).all()
+            wanted_movies = db.session.query(Movie).offset((page * 5) - 5).limit(5).all()
 
         else:
             wanted_movies = Movie.query.all()
 
         if len(wanted_movies) == 0:
-            return '', 404
+            return 'Not found', 404
         return MovieSchema(many=True).dump(wanted_movies), 200
 
     def post(self):
@@ -59,17 +52,16 @@ class MoviesView(Resource):
 @movie_namespace.route('/<int:uid>')
 class MovieView(Resource):
     def get(self, uid):
-        try:
-            movie_by_id = Movie.query.filter(Movie.id == uid).one()
-        except exc.NoResultFound:
-            return '', 404
+        movie_by_id = Movie.query.get(uid)
+        if not movie_by_id:
+            return 'Not found', 404
         return MovieSchema().dump(movie_by_id), 200
 
     def put(self, uid):
         requested_data = request.json
         movie = Movie.query.get(uid)
         if not movie:
-            return '', 404
+            return 'Not found', 404
 
         movie.title = requested_data.get('title')
         movie.description = requested_data.get('description')
@@ -92,8 +84,17 @@ class MovieView(Resource):
         return '', 204
 
 
+#########################################
+
+
 @genre_namespace.route('/')
 class GenresView(Resource):
+    def get(self):
+        all_genres = Genre.query.all()
+        if len(all_genres) == 0:
+            return 'Not found', 404
+        return GenreSchema(many=True).dump(all_genres)
+
     def post(self):
         requested_json = request.json
         new_genre = Genre(**requested_json)
@@ -104,9 +105,14 @@ class GenresView(Resource):
 
 @genre_namespace.route('/<int:uid>')
 class GenreView(Resource):
+    def get(self, uid):
+        genre = Genre.query.get(uid)
+        if not genre:
+            return 'Not found', 404
+        return GenreSchema().dump(genre), 200
+
     def put(self, uid):
         genre = Genre.query.get(uid)
-        print(genre)
         if not genre:
             return '', 404
         requested_json = request.json
@@ -124,8 +130,16 @@ class GenreView(Resource):
         return '', 204
 
 
+#########################################
+
+
 @director_namespace.route('/')
 class DirectorsView(Resource):
+    def get(self):
+        all_directors = Director.query.all()
+        if len(all_directors) == 0:
+            return 'Not found', 404
+
     def post(self):
         requested_json = request.json
         new_director = Director(**requested_json)
@@ -136,6 +150,12 @@ class DirectorsView(Resource):
 
 @director_namespace.route('/<int:uid>')
 class GenreView(Resource):
+    def get(self, uid):
+        director = Director.query.get(uid)
+        if not director:
+            return 'Not found', 404
+        return DirectorSchema().dump(director), 200
+
     def put(self, uid):
         director = Director.query.get(uid)
         if not director:

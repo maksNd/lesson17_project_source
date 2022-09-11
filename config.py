@@ -7,6 +7,7 @@ app.app_context().push()
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.json_ensure_ascii = False
+
 db = SQLAlchemy(app)
 
 api = Api(app)
