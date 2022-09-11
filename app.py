@@ -18,25 +18,18 @@ genre_namespace = api.namespace('genres')
 @movie_namespace.route('/')
 class MoviesView(Resource):
     def get(self):
-        with app.app_context():
-            page = request.values.get('page')
-            director_id = request.values.get('director_id')
-            genre_id = request.values.get('genre_id')
+        page = request.values.get('page')
+        director_id = request.values.get('director_id')
+        genre_id = request.values.get('genre_id')
 
-        if page and not genre_id and not director_id:
-            page = int(page)
-            per_page = 5
-            all_movies = db.session.query(Movie).offset((page * per_page) - per_page).limit(per_page).all()
-            return MovieSchema(many=True).dump(all_movies), 200
-
-        if director_id and not genre_id:
+        if director_id:
             director_id = int(director_id)
             movies_by_director_id = Movie.query.filter(Movie.director_id == director_id).all()
             if len(movies_by_director_id) == 0:
                 return '', 404
             return MovieSchema(many=True).dump(movies_by_director_id), 200
 
-        if genre_id and not director_id:
+        if genre_id:
             genre_id = int(genre_id)
             movies_by_genre_id = Movie.query.filter(Movie.genre_id == genre_id).all()
             if len(movies_by_genre_id) == 0:
@@ -51,11 +44,17 @@ class MoviesView(Resource):
                 return '', 404
             return MovieSchema(many=True).dump(movies), 200
 
+        if page:
+            page = int(page)
+            per_page = 5
+            all_movies = db.session.query(Movie).offset((page * per_page) - per_page).limit(per_page).all()
+            return MovieSchema(many=True).dump(all_movies), 200
 
         else:
-            all_movies = db.session.query(Movie).all()
+            all_movies = Movie.query.all()
+            if len(all_movies) == 0:
+                return '', 404
             return MovieSchema(many=True).dump(all_movies), 200
-        # return '', 404
 
     def post(self):
         requested_data = request.json
