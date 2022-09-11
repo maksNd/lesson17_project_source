@@ -18,8 +18,8 @@ class GenresView(Resource):
     def post(self):
         requested_json = request.json
         new_genre = Genre(**requested_json)
-        with db.session.begin():
-            db.session.add(new_genre)
+        db.session.add(new_genre)
+        db.session.commit()
         return '', 204
 
 
