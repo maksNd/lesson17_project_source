@@ -1,5 +1,9 @@
 from config import db
 
+# from flask_sqlalchemy import SQLAlchemy
+
+# db = SQLAlchemy()
+
 
 class Movie(db.Model):
     __tablename__ = 'movie'
