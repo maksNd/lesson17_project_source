@@ -18,43 +18,36 @@ genre_namespace = api.namespace('genres')
 @movie_namespace.route('/')
 class MoviesView(Resource):
     def get(self):
+
         page = request.values.get('page')
         director_id = request.values.get('director_id')
         genre_id = request.values.get('genre_id')
-
-        if director_id:
-            director_id = int(director_id)
-            movies_by_director_id = Movie.query.filter(Movie.director_id == director_id).all()
-            if len(movies_by_director_id) == 0:
-                return '', 404
-            return MovieSchema(many=True).dump(movies_by_director_id), 200
-
-        if genre_id:
-            genre_id = int(genre_id)
-            movies_by_genre_id = Movie.query.filter(Movie.genre_id == genre_id).all()
-            if len(movies_by_genre_id) == 0:
-                return '', 404
-            return MovieSchema(many=True).dump(movies_by_genre_id), 200
+        print(page, director_id, genre_id)
 
         if director_id and genre_id:
-            director_id = int(director_id)
-            genre_id = int(genre_id)
-            movies = Movie.query.filter(Movie.genre_id == genre_id and Movie.director_id == director_id).all()
-            if len(movies) == 0:
-                return '', 404
-            return MovieSchema(many=True).dump(movies), 200
+            print('director genre')
+            wanted_movies = Movie.query.filter(Movie.genre_id == genre_id, Movie.director_id == director_id).all()
 
-        if page:
+        elif director_id and not genre_id:
+            print('director')
+            wanted_movies = Movie.query.filter(Movie.director_id == director_id).all()
+
+        elif genre_id and not director_id:
+            print('genre')
+            wanted_movies = Movie.query.filter(Movie.genre_id == genre_id).all()
+
+        elif page:
+            print('page')
             page = int(page)
             per_page = 5
-            all_movies = db.session.query(Movie).offset((page * per_page) - per_page).limit(per_page).all()
-            return MovieSchema(many=True).dump(all_movies), 200
+            wanted_movies = db.session.query(Movie).offset((page * per_page) - per_page).limit(per_page).all()
 
         else:
-            all_movies = Movie.query.all()
-            if len(all_movies) == 0:
-                return '', 404
-            return MovieSchema(many=True).dump(all_movies), 200
+            wanted_movies = Movie.query.all()
+
+        if len(wanted_movies) == 0:
+            return '', 404
+        return MovieSchema(many=True).dump(wanted_movies), 200
 
     def post(self):
         requested_data = request.json
