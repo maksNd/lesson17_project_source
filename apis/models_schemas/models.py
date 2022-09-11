@@ -1,8 +1,4 @@
-from config import db
-
-# from flask_sqlalchemy import SQLAlchemy
-
-# db = SQLAlchemy()
+from import_sqlalchemy import db
 
 
 class Movie(db.Model):

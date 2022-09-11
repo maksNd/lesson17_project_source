@@ -1,10 +1,8 @@
 from flask_restx import Namespace, Resource
-from apis.models import Genre
-from apis.schemas import GenreSchema
-from flask_sqlalchemy import SQLAlchemy
+from apis.models_schemas.models import Genre
+from apis.models_schemas.schemas import GenreSchema
 from flask import request
-
-db = SQLAlchemy()
+from import_sqlalchemy import db
 
 genre_ns = Namespace('genres')
 

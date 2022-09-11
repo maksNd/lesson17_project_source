@@ -1,10 +1,8 @@
 from flask import request
 from flask_restx import Namespace, Resource
-from apis.schemas import MovieSchema
-from apis.models import Movie
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from apis.models_schemas.schemas import MovieSchema
+from apis.models_schemas.models import Movie
+from import_sqlalchemy import db
 
 movie_ns = Namespace('movies')
 

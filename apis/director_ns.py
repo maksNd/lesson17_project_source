@@ -1,10 +1,8 @@
 from flask_restx import Resource, Namespace
-from apis.models import Director
-from apis.schemas import DirectorSchema
+from apis.models_schemas.models import Director
+from apis.models_schemas.schemas import DirectorSchema
 from flask import request
-from flask_sqlalchemy import SQLAlchemy
-
-db = SQLAlchemy()
+from import_sqlalchemy import db
 
 director_ns = Namespace('directors')
 
