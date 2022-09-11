@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from marshmallow import Schema, fields
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -243,33 +243,33 @@ data = {
         {"name": "Мультфильм", "pk": 16}, {"name": "Вестерн", "pk": 17}, {"name": "Мюзикл", "pk": 18}],
 }
 # -------------------------------------------------------
+def fill_db():
+    for movie in data["movies"]:
+        m = Movie(
+            id=movie["pk"],
+            title=movie["title"],
+            description=movie["description"],
+            trailer=movie["trailer"],
+            year=movie["year"],
+            rating=movie["rating"],
+            genre_id=movie["genre_id"],
+            director_id=movie["director_id"],
+        )
+        with db.session.begin():
+            db.session.add(m)
 
-for movie in data["movies"]:
-    m = Movie(
-        id=movie["pk"],
-        title=movie["title"],
-        description=movie["description"],
-        trailer=movie["trailer"],
-        year=movie["year"],
-        rating=movie["rating"],
-        genre_id=movie["genre_id"],
-        director_id=movie["director_id"],
-    )
-    with db.session.begin():
-        db.session.add(m)
+    for director in data["directors"]:
+        d = Director(
+            id=director["pk"],
+            name=director["name"],
+        )
+        with db.session.begin():
+            db.session.add(d)
 
-for director in data["directors"]:
-    d = Director(
-        id=director["pk"],
-        name=director["name"],
-    )
-    with db.session.begin():
-        db.session.add(d)
-
-for genre in data["genres"]:
-    d = Genre(
-        id=genre["pk"],
-        name=genre["name"],
-    )
-    with db.session.begin():
-        db.session.add(d)
+    for genre in data["genres"]:
+        d = Genre(
+            id=genre["pk"],
+            name=genre["name"],
+        )
+        with db.session.begin():
+            db.session.add(d)

@@ -1,11 +1,12 @@
 # app.py
 from config import api, db
 from flask import request, current_app
-from flask_restx import Api, Resource
-from flask_sqlalchemy import SQLAlchemy
-from marshmallow import Schema, fields
+from flask_restx import Resource
 from models import Movie, Genre, Director
 from schemas import MovieSchema, GenreSchema, DirectorSchema
+from data_manager.create_data import fill_db
+
+fill_db()
 
 app = current_app
 
@@ -39,7 +40,7 @@ class MoviesView(Resource):
             wanted_movies = Movie.query.all()
 
         if len(wanted_movies) == 0:
-            return 'Not found', 404
+            return '', 404
         return MovieSchema(many=True).dump(wanted_movies), 200
 
     def post(self):
@@ -47,6 +48,7 @@ class MoviesView(Resource):
         new_movie = Movie(**requested_data)
         with db.session.begin():
             db.session.add(new_movie)
+        return '', 204
 
 
 @movie_namespace.route('/<int:uid>')
@@ -54,14 +56,14 @@ class MovieView(Resource):
     def get(self, uid):
         movie_by_id = Movie.query.get(uid)
         if not movie_by_id:
-            return 'Not found', 404
+            return '', 404
         return MovieSchema().dump(movie_by_id), 200
 
     def put(self, uid):
         requested_data = request.json
         movie = Movie.query.get(uid)
         if not movie:
-            return 'Not found', 404
+            return '', 404
 
         movie.title = requested_data.get('title')
         movie.description = requested_data.get('description')
@@ -92,7 +94,7 @@ class GenresView(Resource):
     def get(self):
         all_genres = Genre.query.all()
         if len(all_genres) == 0:
-            return 'Not found', 404
+            return '', 404
         return GenreSchema(many=True).dump(all_genres)
 
     def post(self):
@@ -100,7 +102,7 @@ class GenresView(Resource):
         new_genre = Genre(**requested_json)
         with db.session.begin():
             db.session.add(new_genre)
-        return '', 201
+        return '', 204
 
 
 @genre_namespace.route('/<int:uid>')
@@ -108,7 +110,7 @@ class GenreView(Resource):
     def get(self, uid):
         genre = Genre.query.get(uid)
         if not genre:
-            return 'Not found', 404
+            return '', 404
         return GenreSchema().dump(genre), 200
 
     def put(self, uid):
@@ -138,14 +140,14 @@ class DirectorsView(Resource):
     def get(self):
         all_directors = Director.query.all()
         if len(all_directors) == 0:
-            return 'Not found', 404
+            return '', 404
 
     def post(self):
         requested_json = request.json
         new_director = Director(**requested_json)
         with db.session.begin():
             db.session.add(new_director)
-        return '', 201
+        return '', 204
 
 
 @director_namespace.route('/<int:uid>')
@@ -153,7 +155,7 @@ class GenreView(Resource):
     def get(self, uid):
         director = Director.query.get(uid)
         if not director:
-            return 'Not found', 404
+            return '', 404
         return DirectorSchema().dump(director), 200
 
     def put(self, uid):
